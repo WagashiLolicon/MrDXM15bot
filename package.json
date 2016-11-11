@@ -1,0 +1,23 @@
+{
+  "name": "MrDXM15Bot",
+  "version": "1.5.7",
+  "description": "Music and more",
+  "main": "music.js",
+  "scripts": {
+    "start": "node music.js"
+  },
+
+  "author": "Lucas alias MrDragonXM15",
+  "license": "Apache License",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "discord.js": "^10.0.1",
+    "node-opus": "^0.2.2",
+    "opusscript": "0.0.1",
+    "youtube-search": "^1.0.6",
+    "ytdl-core": "^0.7.18"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  }
+}
