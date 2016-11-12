@@ -1,181 +1,87 @@
-const Discord = require('discord.js');
 const yt = require('ytdl-core');
-const colors = require('colors');
-const search = require('youtube-search');
-const config = require('./config.json');
 
-const bot = new Discord.Client();
-
-var tab = [];
-var i = 0;
-const prefix = "!!";
-var bool = false;
-
-colors.setTheme({
-  custom: ['red', 'underline']
-});
-
-var opts = {
-  maxResults: 3,
-  key: config.APIKey
-};
-
-function music(voiceChannel, i, bool)
-{
-    if (bool == true) {
-        voiceChannel.join().then(connection => {
-            let stream = yt(tab[i], {audioonly: true});
-            const streamOptions = { seek: 0, volume: 0.05 };
-            const dispatcher = connection.playStream(stream, streamOptions);
-            dispatcher.on("end", () => {
-              if (i < tab.length) i++;
-              if (i >= tab.length) i = 0;
-              music(voiceChannel, i, true);
-            });
-        });
-    }
+function Music() {
+    this.i = 0;
+    this.tab = [];
+    this.verif_play = true;
 }
 
-bot.on('ready', () => {
-  console.log("I am ready!".custom);
-  bot.user.setStatus("online", "Need help ? !!help");
-});
+Music.prototype.setVoiceChannel = function (voiceChannel) {
+    this.voiceChannel = voiceChannel;
+};
 
-bot.on('message', message => {
-    const voiceChannel = message.member.voiceChannel;
+Music.prototype.setI = function(i) {
+    this.i = i;
+};
 
+Music.prototype.setTab = function(i, value) {
+    this.tab[i] = value;
+};
 
-    if (message.content.startsWith(prefix + "play")) {
-        bool = true;
-        message.delete(message.author);
-        if (!voiceChannel) return message.reply("You need to connect a voice channel");
-        if (tab[0] == null) return message.reply('No music, please add with `!!add musicname/link`');
-        music(voiceChannel, i, true);
-        message.channel.sendMessage("Run the playlist with " + tab.length + " music");
-        console.log(message.author.username + " run the playlist with " + tab.length + " music");
-    }
+Music.prototype.setTabEnd = function(value) {
+    this.tab[this.tab.length] = value;
+};
 
-    else if (message.content.startsWith(prefix + "stop")) {
-        message.delete(message.author);
-        voiceChannel.leave();
-        bool = false;
-        music(voiceChannel, i, false);
-    }
+Music.prototype.getVoiceChannel = function() {
+    return this.voiceChannel;
+};
 
+Music.prototype.getTab = function (i) {
+    return this.tab[i];
+};
 
-    // else if (message.content.startsWith(prefix + "next")) {
-    //     message.delete();
-    //     if (i < tab.length) {
-    //         i++;
-    //         yt.getInfo(tab[i], function(err, info) {
-    //           search(tab[i], opts, function(err, results) {
-    //             console.log(results[0].title);
-    //             message.channel.sendMessage([
-    //               `Music : **${results[0].title}**`,
-    //               `Link : ${results[0].link}`
-    //             ].join("\n"));
-    //           });
-    //         });
-    //     }
-    //
-    //     if (i >= tab.length) {
-    //       message.channel.sendMessage("No music, please add with `!!add musicname/link` or `!!stop`");
-    //       i = 0;
-    //       tab = [];
-    //       bool = false;
-    //       voiceChannel.leave();
-    //     }
-    //     if(bool) {
-    //       music(voiceChannel, i , true)
-    //     }
-    // }
+Music.prototype.getI = function() {
+    return this.i;
+};
 
-    else if (message.content.startsWith(prefix + "add")){
-        message.delete();
-        var link = message.content.split(' ');
-        link.shift();
-        link = link.join(' ');
-        search(link, opts, function(err, results) {
-            if(err) return console.log(err);
-            for (var y = 0; results[y].kind == 'youtube#channel'; y++);
-              console.log(message.author.username + " add " + results[0].title + " in the playlist");
-              message.channel.sendMessage([
-                `Succesfully add :`,
-                `Title : **${results[0].title}**`,
-                `Link : **${results[0].link}**`,
-                `${tab.length + 1} music in the playlist`
-              ]);
-              tab[tab.length] = (results[y].link);
+Music.prototype.getLengthTab = function() {
+    return this.tab.length;
+};
+
+Music.prototype.clearTab = function() {
+    this.tab = [];
+};
+
+Music.prototype.voice = function() {
+    if (this.verif_play == false) return;
+    this.verif_play = false;
+    this.voiceChannel.join().then(connection => {
+        let stream = yt(this.getTab(this.getI()), {audioonly: true});
+        streamoptions = { seek: 0, volume: 0.05 };
+        this.dispatcher = connection.playStream(stream, streamoptions);
+        this.dispatcher.on("end", () => {
+            if (this.getI() < this.getLengthTab()) this.setI(this.i + 1);
+            if (this.getI() >= this.getLengthTab()) this.setI(0);
+            return this.voice(this.getVoiceChannel(), this.getI());
         });
-    }
+    });
+};
 
-    else if (message.content === prefix + "clear") {
-        message.delete(message.author);
-        tab = [];
-        message.channel.sendMessage("Playlist has been deleted");
-    }
+Music.prototype.stop = function () {
+    this.clearTab();
+    this.dispatcher.end();
+    this.voiceChannel.leave();
+    this.verif_play = true;
+};
 
-    else if (message.content.startsWith(prefix + "volume ")) {
-      message.delete(message.author);
-      var volume = message.content.split(' ');
-      volume.shift();
-      newvolume = volume / 100;
-      var dispatcher = bot.voiceConnections.get(message.guild.id).player.dispatcher
-      dispatcher.setVolume(newvolume)
-      message.channel.sendMessage(message.author.username + " set volume to " + volume + "%")
-    }
+Music.prototype.clear = function () {
+    this.clearTab();
+};
 
-    else if (message.content === prefix + "pause") {
-      message.delete(message.author);
-      var dispatcher = bot.voiceConnections.get(message.guild.id).player.dispatcher
-      dispatcher.pause()
-      console.log("pause")
-    }
+Music.prototype.pause = function () {
+    this.dispatcher.pause();
+};
 
-    else if (message.content === prefix + "unpause") {
-      message.delete(message.author);
-      var dispatcher = bot.voiceConnections.get(message.guild.id).player.dispatcher
-      dispatcher.resume()
-      console.log("unpause")
-    }
+Music.prototype.resume = function () {
+    this.dispatcher.resume();
+};
 
-    if (message.content === "plane") {
-      message.channel.sendMessage("http://i.imgur.com/r5D9925.gifv");
-    }
+Music.prototype.volume = function (value) {
+    this.dispatcher.setVolume(value);
+};
 
-    if (message.content === prefix + "help") {
-      message.delete(message.author);
-      message.channel.sendMessage("Command list :\n```!!media - See help about the media player\n!!botversion - See informations about the bot```");
-    }
+Music.prototype.remove = function(value) {
+    this.tab.splice(value, 1);
+};
 
-    if (message.content === prefix + "media") {
-      message.delete(message.author);
-      message.channel.sendMessage("Command list :\n```!!add <musicname/link> - Add music in the playlist\n!!play - Play music in the playlist\n!!stop - Stop the music\n!!clear - Delete the playlist\n !!next - Play the next video in the playlist (not available now)\n!!pause - Pause music\n!!unpause - Unpause music\n\n!!volume <0-200> - Set bot volume.```");
-    }
-
-    if (message.content === prefix + "botversion") {
-      message.delete(message.author);
-      message.channel.sendMessage([
-        `Version : **1.5.7**`,
-        `Creator : MrDragonXM15 | **@MrDragonXM15#7887**`,
-        `With : {Creaprog} | **@Creaprog#9531**`,
-        ``,
-        `Info : Play Music, and more ...`
-      ].join("\n"));
-    }
-
-    if (message.content === prefix + "profil") {
-      console.log('Information about '.red + message.author.username.red + ' required'.red);
-      message.channel.sendMessage([
-        `Username : **${message.author.username}**`,
-        `Avatar : ${message.author.avatarURL}`,
-        `ID : **${message.author.id}**`,
-        `Created on : **${message.author.creationDate}**`,
-        `Status on the server : **${message.author.status}**`,
-        `Game : **${message.author.game}**`,
-      ].join("\n"));
-    }
-
-});
-
-bot.login(config.token);
+module.exports = Music;

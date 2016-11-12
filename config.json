@@ -1,4 +1,5 @@
 {
-  "APIKey" : "YoutubeAPIv3 Key",
-  "token" : "Bot token"
+  "prefix" : "!!",
+  "token" : "yourBotToken",
+  "APIKey" : "yourYoutubeAPIKeyV3"
 }

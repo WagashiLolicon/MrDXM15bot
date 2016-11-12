@@ -1,10 +1,10 @@
 {
   "name": "MrDXM15Bot",
-  "version": "1.5.7",
-  "description": "Music and more",
-  "main": "music.js",
+  "version": "1.6.8",
+  "description": "Play music and more",
+  "main": "server.js",
   "scripts": {
-    "start": "node music.js"
+    "start": "node server.js"
   },
 
   "author": "Lucas alias MrDragonXM15",

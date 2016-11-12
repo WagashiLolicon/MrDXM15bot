@@ -20,3 +20,5 @@ You can just use ```npm start``` to start your bot
 - You need install [node.js](https://nodejs.org/en/) (please have the last version)
 - You need install [ffmpeg](https://github.com/Creaprog/install_FFMPEG)
 - If you want you can install python
+
+- You need use your terminal or windows Powershell to use and install the bot
