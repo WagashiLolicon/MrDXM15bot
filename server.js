@@ -131,7 +131,7 @@ bot.on('message', message => {
     else if (message.content === prefix + "botversion") {
       message.delete(message.author);
       message.channel.sendMessage([
-        `Version : **1.6.8**`,
+        `Version : **1.6.9**`,
         `Creator : MrDragonXM15 | **@MrDragonXM15#7887**`,
         `With : {Creaprog} | **@Creaprog#9531**`,
         ``,
