@@ -1,3 +1,5 @@
+See on : [DXMCorp-coding.tk](http://dxmcorp-coding.tk)
+
 # First launch
 First, you need install dependency of the bot with ```npm install```
 
@@ -22,3 +24,4 @@ You can just use ```npm start``` to start your bot
 - If you want you can install python
 
 You need use your terminal or windows Powershell to use and install the bot
+
