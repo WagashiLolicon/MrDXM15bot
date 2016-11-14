@@ -1,4 +1,4 @@
-See on : [DXMCorp-coding.tk](http://dxmcorp-coding.tk)
+See on : [DXMCorp Coding](http://dxmcorp-coding.esy.es)
 
 # First launch
 First, you need install dependency of the bot with ```npm install```
